@@ -1,16 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from 'react';
+import Btn from './components/Btn';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Container, Row } from 'react-bootstrap';
 
-function App() {
-  const [count, setCount] = useState(0)
+
+const App = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    getProducts();
+  }, []);
+
+  async function getProducts() {
+    try {
+      const response = await fetch('https://dummyjson.com/products');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      setProducts(res.products);
+    } catch (error) {
+      console.log(error);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <>
-     <h1>Hello World</h1>
-    </>
-  )
-}
+    <Container>
+      {loading && <h1>Loading...</h1>}
+      {error && <h1>Something went wrong!</h1>}
+      <Row>
+      
+        {products.map((data) => (
+          <Btn key={data.id} item={data} />
+        ))}
+       
+      </Row>
+    </Container>
+  );
+};
 
-export default App
+export default App;
